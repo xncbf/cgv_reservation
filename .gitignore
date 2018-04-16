@@ -1,2 +1,14 @@
-*.pyc
-auth.py
+*.egg-info
+*.pot
+*.py[co]
+.tox/
+*.xml
+__pycache__
+MANIFEST
+.idea/
+db.sqlite3
+/static/
+*.pid
+venv/
+.DS_Store
+.env

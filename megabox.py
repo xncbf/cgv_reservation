@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-# -*- encoding: utf-8 -*-
-# vim: ts=4 st=4 sts=4 expandtab syntax=python
 import math
 import os
 import sys
@@ -9,24 +6,17 @@ from systrace import trace
 
 t1 = time.time()
 
-USE_GTK2 = False
 
 try:
     import gi
-    from gi.repository import GLib, Soup
-
-    if USE_GTK2:
-        gi.require_version('Gtk', '2.0')
-        gi.require_version('Gdk', '2.0')
-        gi.require_version('WebKit', '1.0')
-    from gi.repository import Gtk, WebKit
+    gi.require_version('Soup', '2.4')
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('WebKit', '3.0')
+    from gi.repository import GLib, Soup, Gtk, WebKit
 except (ValueError, ImportError):
     packageName = 'gir1.2-webkit-3.0'
-    if USE_GTK2:
-        packageName = 'gir1.2-webkit-1.0'
-    print 'Please install %s package' % packageName
-    print
-    print '$ sudo apt-get install %s' % packageName
+    print('Please install %s package' % packageName)
+    print('$ sudo apt-get install %s' % packageName)
     sys.exit(1)
 
 BASE_PATH = os.path.join(os.getenv('HOME'), ".megabox")
@@ -129,10 +119,10 @@ class Window(Gtk.Window, object):
         }.get(uri)
 
         if cb:
-            print 'handle uri:', uri
+            print('handle uri: %s' % uri)
             cb()
         else:
-            print 'unhandled uri:', uri
+            print('unhandled uri: %s' % uri)
 
     @trace()
     def handle_load_status(self, webview, psepc):
@@ -192,13 +182,13 @@ class Window(Gtk.Window, object):
                 continue
             em = item.query_selector('em')
             title = em.get_text_content()
-            print title, repr(title)
+            print('%s %s' % (title, repr(title)))
             if not TITLE in title:
                 continue
-            print title
+            print(title)
             for span in iter_dom(item.query_selector_all('span')):
                 link = span.get_children().item(0)
-                print span, link
+                print('%s %s' % (span, link))
                 link.click()
                 break
             break
@@ -268,7 +258,7 @@ class Window(Gtk.Window, object):
         def do_something():
             for item in items[:8]:
                 item.click()
-                print get_xy(item)
+                print(get_xy(item))
                 yield True
                 item.click()
                 yield True
@@ -299,7 +289,7 @@ class Window(Gtk.Window, object):
 
     @trace()
     def handle_success(self):
-        print 'payment checkout is done. Total time:', time.time() - t1, 'sec'
+        print('payment checkout is done. Total time: %s sec' % (time.time() - t1))
 
     @trace()
     def setup_webview(self, webview):

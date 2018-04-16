@@ -9,6 +9,7 @@ __TRACE_MARKER = '/sys/kernel/debug/tracing/trace_marker'
 if os.access(__TRACE_MARKER, os.W_OK):
     __TRACE_FILE = open(__TRACE_MARKER, 'w')
     __PID = str(os.getpid())
+
     def traceBegin(name):
         buf = '|'.join(('B', __PID, name))
         __TRACE_FILE.write(buf)
@@ -27,11 +28,14 @@ else:
     traceBegin = lambda name: None 
     traceEnd = lambda: None
 
+
 class Trace:
     def __init__(self, name):
         traceBegin(name)
+
     def __del__(self):
         traceEnd()
+
 
 class trace:
     def __init__(self, name = ''):
@@ -44,6 +48,7 @@ class trace:
             t = Trace(self.name)
             return func(*args)
         return wrapper
+
 
 def main():
     import time
@@ -74,7 +79,6 @@ def main():
     s = Sleep()
     s.sleep(1)
 
+
 if __name__ == '__main__':
     main()
-
-# vim: ts=4 st=4 sts=4 expandtab syntax=python

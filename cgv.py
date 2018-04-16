@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-# -*- encoding: utf-8 -*-
-# vim: ts=4 st=4 sts=4 expandtab syntax=python
 import math
 import os
 import sys
@@ -9,23 +6,17 @@ from systrace import trace
 
 t1 = time.time()
 
-USE_GTK2 = False
 
 try:
     import gi
-    from gi.repository import GLib, Soup
-
-    if USE_GTK2:
-        gi.require_version('Gtk', '2.0')
-        gi.require_version('WebKit', '1.0')
-    from gi.repository import Gtk, WebKit
+    gi.require_version('Soup', '2.4')
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('WebKit', '3.0')
+    from gi.repository import GLib, Soup, Gtk, WebKit
 except (ValueError, ImportError):
     packageName = 'gir1.2-webkit-3.0'
-    if USE_GTK2:
-        packageName = 'gir1.2-webkit-1.0'
-    print 'Please install %s package' % packageName
-    print
-    print '$ sudo apt-get install %s' % packageName
+    print('Please install %s package' % packageName)
+    print('$ sudo apt-get install %s' % packageName)
     sys.exit(1)
 
 BASE_PATH = os.path.join(os.getenv('HOME'), ".cgv")
@@ -38,10 +29,10 @@ from config import *
 DEBUG = False
 # 왕십리 2013년 4월 25일
 START_URI = "http://m.cgv.co.kr/Theater/Theater.aspx?TheaterCd=%s&AreaCd=&PlayYMD=%s" % (THEATER_CODE, PLAY_YMD)
-START_URI = "http://m.cgv.co.kr/Theater/Special.aspx?TheaterType=02&TheaterCd=%s&PlayYMD=%s" % (THEATER_CODE, PLAY_YMD)
+# START_URI = "http://m.cgv.co.kr/Theater/Special.aspx?TheaterType=02&TheaterCd=%s&PlayYMD=%s" % (THEATER_CODE, PLAY_YMD)
 
 if DEBUG:
-	START_URI = "http://m.cgv.co.kr/Theater/Special.aspx?TheaterType=02&TheaterCd=0074&PlayYMD=20130421"
+    START_URI = "http://m.cgv.co.kr/Theater/Special.aspx?TheaterType=02&TheaterCd=0074&PlayYMD=20130421"
 
 HOME_URL = "http://m.cgv.co.kr/"
 LOGIN_URI = "http://m.cgv.co.kr/Member/Login.aspx"
@@ -122,7 +113,7 @@ class Window(Gtk.Window, object):
         if cb:
             cb()
         else:
-            print 'unhandled uri:', uri
+            print('unhandled uri: %s' % uri)
 
     @trace()
     def handle_load_status(self, webview, psepc):
@@ -168,7 +159,7 @@ class Window(Gtk.Window, object):
                 text = link.get_text_content()
                 time, count = text.split()
                 count = count[1:-1]
-                print time, count, link
+                print('%s %s %s' % (time, count, link))
                 # FIXME
                 link.click()
                 break
@@ -208,10 +199,13 @@ class Window(Gtk.Window, object):
 
             def dist(x, y):
                 return math.sqrt((x - CENTER_X) ** 2 + (y - CENTER_Y) ** 2)
+
             ad = dist(ax, ay)
             bd = dist(bx, by)
-            if ad < bd: return -1
-            elif ad > bd: return 1
+            if ad < bd:
+                return -1
+            elif ad > bd:
+                return 1
             return 0
 
         items.sort(sort_seat)
@@ -256,7 +250,7 @@ class Window(Gtk.Window, object):
         cardtype.set_value(CARDTYPE)
 
         for i, data in enumerate(CARDNUM.split()):
-            cardno = dom.get_element_by_id('tbCardNo%d' % (i+1))
+            cardno = dom.get_element_by_id('tbCardNo%d' % (i + 1))
             cardno.set_value(data)
 
         mm = dom.get_element_by_id('ddlCardMonth')
@@ -274,7 +268,7 @@ class Window(Gtk.Window, object):
 
     @trace()
     def handle_success(self):
-        print 'payment checkout is done. Total time:', time.time() - t1, 'sec'
+        print('payment checkout is done. Total time: %s sec' % (time.time() - t1))
 
     @trace()
     def setup_webview(self, webview):
@@ -297,11 +291,13 @@ class Window(Gtk.Window, object):
 
         webview.set_settings(settings)
 
+
 if __name__ == '__main__':
     win = Window()
     win.show_all()
 
     exchook = sys.excepthook
+
 
     def new_hook(type, value, traceback):
         if isinstance(value, KeyboardInterrupt):
@@ -309,10 +305,10 @@ if __name__ == '__main__':
             return
         return exchook(type, value, traceback)
 
+
     sys.excepthook = new_hook
 
     # it should raise KeyboardInterrupt
     GLib.timeout_add(500, lambda: True)
 
     Gtk.main()
-
